@@ -1,0 +1,33 @@
+# Workflow for OWASP BAseline Scan
+name: SEC488 DAST
+
+# Controls when the action wil run.  
+# Triggers the workflow on push or pull request events but only for the master branch
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+jobs:
+  # this workflow contains a single job called build
+  build:
+    # the type of runner that the job will run on
+    runs-on: ubuntu-latest
+    
+    # steps of the sequence
+    - uses: actions/checkout@v2
+    
+    # run apache server
+    - name: Startup web server
+      run: docker run -v $(pwd):/var/www/html -dit --rm --name php php:apache
+
+    # run owasp
+    - name: OWASP ZAP Baseline Scan
+      uses: zaproxy/action-baseline@v0.3.0
+      with:
+        # target url of php container
+        target: http://172.17.0.2
